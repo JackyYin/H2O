@@ -20,5 +20,5 @@ sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
 
 Run all of test cases:
 ```shell=
-make tests
+make runtests
 ```

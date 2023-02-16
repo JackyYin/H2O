@@ -26,6 +26,17 @@ static void test_H2O_FRAME_HEADER_TYPE(void)
 	CU_ASSERT(0x09 == h9.type);
 }
 
+static void test_H2O_FRAME_HEADER_LENGTH_OVERFLOW(void)
+{
+	struct h2o_frame_header h1 = {0xffffffff, H2O_FRAME_TYPE_DATA, 0, 0, 0};
+	struct h2o_frame_header h2 = {-2, H2O_FRAME_TYPE_GOAWAY, 0, 0, 0};
+
+	CU_ASSERT(0xffffff == h1.length);
+	CU_ASSERT(0x00 == h1.type);
+	CU_ASSERT(0xfffffe == h2.length);
+	CU_ASSERT(0x07 == h2.type);
+}
+
 static void test_H2O_FRAME_HEADER_RESERVED(void)
 {
 	struct h2o_frame_header h0 = {0, H2O_FRAME_TYPE_DATA, 0xff, 0, 0xff};
@@ -45,6 +56,10 @@ bool h2o_frame_header_ut_register()
 
 	if (!CU_add_test(pSuite, "test of frame header types",
 			 test_H2O_FRAME_HEADER_TYPE))
+		return false;
+
+	if (!CU_add_test(pSuite, "test of frame header length overflow",
+			 test_H2O_FRAME_HEADER_LENGTH_OVERFLOW))
 		return false;
 
 	if (!CU_add_test(pSuite, "test of frame header reserved bit field",

@@ -18,7 +18,7 @@ all: $(LIBURING_DIR) $(SRC_DIR)/$(SRC_EXE)
 runtests: $(TEST_DIR)/$(UT_EXE)
 	$<
 
-$(TEST_DIR)/$(UT_EXE): $(TEST_OBJECTS)
+$(TEST_DIR)/$(UT_EXE): $(TEST_OBJECTS) $(SRC_DIR)/huffman.o
 	$(CC) -o $@ $^ -lcunit
 
 $(TEST_DIR)/%.o: $(TEST_DIR)/%.c

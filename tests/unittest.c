@@ -2,11 +2,13 @@
 #include <stdint.h>
 
 #include "h2o_frame_header_unittest.h"
+#include "h2o_huffman_decoder_unittest.h"
 
 int init_suite_general(void) { return 0; }
 int clean_suite_general(void) { return 0; }
 
-bool (*register_funcs[])(void) = {h2o_frame_header_ut_register};
+bool (*register_funcs[])(void) = {h2o_frame_header_ut_register,
+				  h2o_huffman_decoder_ut_register};
 
 int main()
 {

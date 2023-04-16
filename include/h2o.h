@@ -33,6 +33,19 @@ enum h2o_stream_state {
 };
 
 /**
+ * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-6.5.2
+ */
+enum h2o_settings {
+	H2O_SETTINGS_HEADER_TABLE_SIZE = 0x1,
+	H2O_SETTINGS_ENABLE_PUSH = 0x2,
+	H2O_SETTINGS_MAX_CONCURRENT_STREAMS = 0x3,
+	H2O_SETTINGS_INITIAL_WINDOW_SIZE = 0x4,
+	H2O_SETTINGS_MAX_FRAME_SIZE = 0x5,
+	H2O_SETTINGS_HEADER_LIST_SIZE = 0x6,
+	H2O_SETTINGS_MAX,
+};
+
+/**
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-7
  */
 enum h2o_error_code {
@@ -72,7 +85,21 @@ struct h2o_frame_header {
 	uint32_t reserved : 1;
 
 	uint32_t stream_id : 31;
-};
+} __attribute__((packed));
+
+/**
+ * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-6.5.1
+ */
+struct h2o_setting {
+	uint16_t id;
+	uint32_t value;
+} __attribute__((packed));
+
+struct h2o_settings_frame {
+	struct h2o_frame_header hd;
+
+	struct h2o_setting settings[];
+} __attribute__((packed));
 
 /**
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-6.8
@@ -83,7 +110,7 @@ struct h2o_goaway_frame {
 	uint32_t reserved : 1;
 	uint32_t last_stream_id : 31;
 	uint32_t error_code;
-};
+} __attribute__((packed));
 
 struct h2o_stream {
 	/**
@@ -92,6 +119,15 @@ struct h2o_stream {
 	uint8_t state;
 
 	uint32_t id;
+};
+
+struct h2o_conn_context {
+	int negotiated;
+	int fd;
+	/*
+	 * See: `h2o_settings`
+	 */
+	unsigned int settings[H2O_SETTINGS_MAX];
 };
 
 #endif

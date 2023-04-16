@@ -1,6 +1,11 @@
 #include "h2o.h"
 #include "h2o_frame_header_unittest.h"
 
+static void test_H2O_FRAME_HEADER_SIZEOF(void)
+{
+	CU_ASSERT(9 == sizeof(struct h2o_frame_header));
+}
+
 static void test_H2O_FRAME_HEADER_TYPE(void)
 {
 	struct h2o_frame_header h0 = {0, H2O_FRAME_TYPE_DATA, 0, 0, 0};
@@ -52,6 +57,10 @@ bool h2o_frame_header_ut_register()
 					clean_suite_general);
 
 	if (!pSuite)
+		return false;
+
+	if (!CU_add_test(pSuite, "test sizeof() frame header",
+			 test_H2O_FRAME_HEADER_SIZEOF))
 		return false;
 
 	if (!CU_add_test(pSuite, "test of frame header types",

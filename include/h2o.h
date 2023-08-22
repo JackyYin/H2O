@@ -8,7 +8,7 @@
  */
 enum h2o_frame_type {
 	H2O_FRAME_TYPE_DATA,
-	H2O_FRAME_TYPE_HEADER,
+	H2O_FRAME_TYPE_HEADERS,
 	H2O_FRAME_TYPE_PRIORITY,
 	H2O_FRAME_TYPE_RST_STREAM,
 	H2O_FRAME_TYPE_SETTINGS,
@@ -124,6 +124,7 @@ struct h2o_stream {
 struct h2o_conn_context {
 	int negotiated;
 	int fd;
+	uint32_t stream_id;
 	/*
 	 * See: `h2o_settings`
 	 */

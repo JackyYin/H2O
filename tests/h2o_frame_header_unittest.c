@@ -9,7 +9,7 @@ static void test_H2O_FRAME_HEADER_SIZEOF(void)
 static void test_H2O_FRAME_HEADER_TYPE(void)
 {
 	struct h2o_frame_header h0 = {0, H2O_FRAME_TYPE_DATA, 0, 0, 0};
-	struct h2o_frame_header h1 = {0, H2O_FRAME_TYPE_HEADER, 0, 0, 0};
+	struct h2o_frame_header h1 = {0, H2O_FRAME_TYPE_HEADERS, 0, 0, 0};
 	struct h2o_frame_header h2 = {0, H2O_FRAME_TYPE_PRIORITY, 0, 0, 0};
 	struct h2o_frame_header h3 = {0, H2O_FRAME_TYPE_RST_STREAM, 0, 0, 0};
 	struct h2o_frame_header h4 = {0, H2O_FRAME_TYPE_SETTINGS, 0, 0, 0};

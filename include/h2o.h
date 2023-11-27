@@ -1,9 +1,15 @@
 #ifndef _H2O_H
 #define _H2O_H
 
+#include <liburing.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/ssl.h>
+#include <mbedtls/x509.h>
 #include <stdint.h>
 
-/**
+#include "trie.h"
+/*
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#name-frame-definitions
  */
 enum h2o_frame_type {
@@ -19,7 +25,7 @@ enum h2o_frame_type {
 	H2O_FRAME_TYPE_CONTINUATION,
 };
 
-/**
+/*
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-5.1
  */
 enum h2o_stream_state {
@@ -29,10 +35,10 @@ enum h2o_stream_state {
 	H2O_STREAM_STATE_OPEN,
 	H2O_STREAM_STATE_HALF_CLOSED_LOCAL,
 	H2O_STREAM_STATE_HALF_CLOSED_REMOTE,
-	H2O_STREAM_STATE_CLOSED,
+	H2O_STREAM_STATE_CLOSED
 };
 
-/**
+/*
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-6.5.2
  */
 enum h2o_settings {
@@ -45,7 +51,7 @@ enum h2o_settings {
 	H2O_SETTINGS_MAX,
 };
 
-/**
+/*
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-7
  */
 enum h2o_error_code {
@@ -65,7 +71,7 @@ enum h2o_error_code {
 	H2O_ERROR_CODE_HTTP_1_1_REQUIRED,
 };
 
-/**
+/*
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-4.1
  */
 struct h2o_frame_header {
@@ -87,7 +93,7 @@ struct h2o_frame_header {
 	uint32_t stream_id : 31;
 } __attribute__((packed));
 
-/**
+/*
  * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-6.5.1
  */
 struct h2o_setting {
@@ -95,40 +101,17 @@ struct h2o_setting {
 	uint32_t value;
 } __attribute__((packed));
 
-struct h2o_settings_frame {
-	struct h2o_frame_header hd;
+struct h2o {
+	int server_fd;
+	struct io_uring ring;
+	struct h2o_trie url_map_trie;
 
-	struct h2o_setting settings[];
-} __attribute__((packed));
-
-/**
- * Ref: https://www.rfc-editor.org/rfc/rfc9113#section-6.8
- */
-struct h2o_goaway_frame {
-	struct h2o_frame_header hd;
-
-	uint32_t reserved : 1;
-	uint32_t last_stream_id : 31;
-	uint32_t error_code;
-} __attribute__((packed));
-
-struct h2o_stream {
-	/**
-	 * See: `h2o_stream_state`
-	 */
-	uint8_t state;
-
-	uint32_t id;
+	struct {
+		mbedtls_ssl_config conf;
+		mbedtls_x509_crt cert;
+		mbedtls_pk_context pkey;
+		mbedtls_ctr_drbg_context ctr_drbg;
+		mbedtls_entropy_context entropy;
+	} tls;
 };
-
-struct h2o_conn_context {
-	int negotiated;
-	int fd;
-	uint32_t stream_id;
-	/*
-	 * See: `h2o_settings`
-	 */
-	unsigned int settings[H2O_SETTINGS_MAX];
-};
-
 #endif

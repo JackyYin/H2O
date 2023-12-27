@@ -268,7 +268,7 @@ static int parse_location(struct h2o *h, struct h2o_config *conf,
 {
 	char *path = item->val;
 	struct h2o_router *router = NULL;
-	struct h2o_hashmap *map = h2o_hashmap_init();
+	struct h2o_hashmap *map = h2o_hashmap_init(16);
 
 	if (!map)
 		return -ENOMEM;
@@ -337,10 +337,12 @@ static int try_load_config_file(struct h2o *h, struct h2o_config *conf)
 		return ret;
 
 	ret = parse_config_file(h, conf);
-	if (ret)
-		return ret;
 
-	return 0;
+	munmap(conf->config_file_addr_begin,
+	       conf->config_file_addr_end - conf->config_file_addr_begin);
+	conf->config_file_addr_begin = NULL;
+	conf->config_file_addr_end = NULL;
+	return ret;
 }
 
 struct h2o_config *h2o_get_default_config() { return &default_config; }

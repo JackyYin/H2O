@@ -256,7 +256,7 @@ static void header_frame_parser(uint32_t length, uint8_t flags,
 	}
 
 	if (!stream->headers)
-		stream->headers = h2o_hashmap_init();
+		stream->headers = h2o_hashmap_init(16);
 
 	uint8_t *rbufend = *rbuf + length;
 	while (*rbuf < rbufend) {

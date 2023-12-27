@@ -11,7 +11,7 @@ struct h2o_hashmap {
 	struct h2o_hashmap_entry *buckets;
 };
 
-struct h2o_hashmap *h2o_hashmap_init();
+struct h2o_hashmap *h2o_hashmap_init(size_t capacity);
 int h2o_hashmap_set(struct h2o_hashmap *hash, char *key, char *value);
 char *h2o_hashmap_get(struct h2o_hashmap *hash, char *key);
 void h2o_hashmap_uninit(struct h2o_hashmap *hash);

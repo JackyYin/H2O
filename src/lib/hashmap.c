@@ -14,7 +14,7 @@ struct h2o_hashmap_entry {
 
 #define SEED (0x1304759)
 
-struct h2o_hashmap *h2o_hashmap_init()
+struct h2o_hashmap *h2o_hashmap_init(size_t capacity)
 {
 	struct h2o_hashmap *hash = malloc(sizeof(*hash));
 
@@ -23,7 +23,7 @@ struct h2o_hashmap *h2o_hashmap_init()
 
 	memset(hash, 0, sizeof(*hash));
 
-	hash->capacity = 16;
+	hash->capacity = capacity;
 	hash->length = 0;
 
 	hash->buckets = calloc(hash->capacity, sizeof(hash->buckets[0]));

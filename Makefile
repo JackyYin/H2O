@@ -6,6 +6,7 @@ XXHASH_DIR ?= xxHash
 GNUTLS_DIR ?= gnutls
 MBEDTLS_DIR ?= mbedtls
 LIB_DIR ?= $(SRC_DIR)/lib
+TOOLS_DIR ?= $(SRC_DIR)/tools
 
 LIB_SOURCE := $(wildcard $(LIB_DIR)/*.c)
 LIB_OBJECTS := $(patsubst %.c, %.o, $(LIB_SOURCE))
@@ -18,9 +19,11 @@ SRC_SOURCE := $(wildcard $(SRC_DIR)/*.c)
 SRC_OBJECTS := $(patsubst %.c, %.o, $(SRC_SOURCE))
 SRC_EXE = h2o
 
+MIMEGEN_EXE = mimegen
+
 .PHONY: all runtests clean
 
-all: $(LIBURING_DIR) $(XXHASH_DIR) $(MBEDTLS_DIR) $(SRC_DIR)/$(SRC_EXE) mimegen
+all: $(LIBURING_DIR) $(XXHASH_DIR) $(MBEDTLS_DIR) $(SRC_EXE) $(MIMEGEN_EXE)
 
 runtests: $(TEST_DIR)/$(UT_EXE)
 	$<
@@ -31,16 +34,16 @@ $(TEST_DIR)/$(UT_EXE): $(TEST_OBJECTS) $(LIB_OBJECTS)
 $(TEST_DIR)/%.o: $(TEST_DIR)/%.c
 	$(CC) -c -o $@ -I$(INCLUDE_DIR) -g -Wall -Wno-overflow $<
 
-$(SRC_DIR)/$(SRC_EXE): $(SRC_OBJECTS)
-	$(CC) -o $@ $^ -luring -lxxhash -lmbedtls -lmbedcrypto -lmbedx509 -L$(LIBURING_DIR)/src -L$(XXHASH_DIR) -L$(MBEDTLS_DIR)/library
-
 $(SRC_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) -c -o $@ -I$(INCLUDE_DIR) -I$(LIBURING_DIR)/src/include -I$(MBEDTLS_DIR)/include -I$(MBEDTLS_DIR)/library -g -Wall $<
 
 $(LIB_DIR)/%.o: $(LIB_DIR)/%.c $(XXHASH_DIR)
 	$(CC) -c -o $@ -I$(INCLUDE_DIR) -I$(XXHASH_DIR) -g -Wall $<
 
-mimegen: $(LIB_OBJECTS) $(SRC_DIR)/mimegen.o
+$(SRC_EXE): $(SRC_OBJECTS) $(LIB_OBJECTS)
+	$(CC) -o $@ $^ -luring -lxxhash -lmbedtls -lmbedcrypto -lmbedx509 -L$(LIBURING_DIR)/src -L$(XXHASH_DIR) -L$(MBEDTLS_DIR)/library
+
+$(MIMEGEN_EXE): $(TOOLS_DIR)/mimegen.o $(LIB_OBJECTS)
 	$(CC) -o $@ $^ -lxxhash -L$(XXHASH_DIR)
 
 $(LIBURING_DIR):
@@ -64,5 +67,7 @@ clean:
 	rm -rf $(XXHASH_DIR)
 	rm -rf $(MBEDTLS_DIR)
 	rm -rf $(LIB_OBJECTS)
-	rm -rf $(SRC_OBJECTS) $(SRC_DIR)/$(SRC_EXE)
-	rm -rf $(TEST_OBJECTS) $(TEST_DIR)/$(UT_EXE)
+	rm -rf $(TOOLS_OBJECTS)
+	rm -rf $(SRC_OBJECTS)
+	rm -rf $(TEST_OBJECTS)
+	rm -rf $(MIMEGEN_EXE) $(SRC_EXE) $(TEST_DIR)/$(UT_EXE)

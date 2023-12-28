@@ -2,6 +2,8 @@
 #define _H2O_RING_BUF_H
 
 #include <assert.h>
+#include <errno.h>
+#include <string.h>
 
 #define DECLARE_RINGBUF_T(rb_name, type_name, element_size)                    \
 	static_assert((element_size & (element_size - 1)) == 0,                \
@@ -10,7 +12,7 @@
 		int head, tail;                                                \
 		type_name eles[element_size];                                  \
 	};                                                                     \
-	static void rb_name##_init(struct rb_name *rb)                         \
+	__attribute__((unused)) static void rb_name##_init(struct rb_name *rb) \
 	{                                                                      \
 		memset(rb, 0, sizeof(*rb));                                    \
 	}                                                                      \

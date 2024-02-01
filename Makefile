@@ -23,10 +23,14 @@ MIMEGEN_EXE = mimegen
 
 .PHONY: all runtests clean
 
-all: $(LIBURING_DIR) $(XXHASH_DIR) $(MBEDTLS_DIR) $(SRC_EXE) $(MIMEGEN_EXE)
+all: gen-mime-header $(SRC_EXE)
 
 runtests: $(TEST_DIR)/$(UT_EXE)
 	$<
+
+gen-mime-header: $(MIMEGEN_EXE)
+	./$(MIMEGEN_EXE) ./mime.types > $(INCLUDE_DIR)/mime.h
+
 
 $(TEST_DIR)/$(UT_EXE): $(TEST_OBJECTS) $(LIB_OBJECTS)
 	$(CC) -o $@ $^ -lcunit -lxxhash -L$(XXHASH_DIR)
@@ -56,8 +60,7 @@ $(XXHASH_DIR):
 	make -C $(XXHASH_DIR)
 
 $(MBEDTLS_DIR):
-	# git clone https://github.com/Mbed-TLS/mbedtls.git
-	wget https://github.com/Mbed-TLS/mbedtls/archive/refs/tags/mbedtls-2.28.5.tar.gz
+	wget --no-clobber https://github.com/Mbed-TLS/mbedtls/archive/refs/tags/mbedtls-2.28.5.tar.gz
 	tar zxvf mbedtls-2.28.5.tar.gz
 	mv mbedtls-mbedtls-2.28.5 $(MBEDTLS_DIR)
 	CFLAGS="-g" make -C $(MBEDTLS_DIR) lib

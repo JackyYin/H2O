@@ -29,12 +29,12 @@ runtests: $(TEST_DIR)/$(UT_EXE)
 	$<
 
 $(TEST_DIR)/$(UT_EXE): $(TEST_OBJECTS) $(LIB_OBJECTS)
-	$(CC) -o $@ $^ -lcunit
+	$(CC) -o $@ $^ -lcunit -lxxhash -L$(XXHASH_DIR)
 
-$(TEST_DIR)/%.o: $(TEST_DIR)/%.c
-	$(CC) -c -o $@ -I$(INCLUDE_DIR) -g -Wall -Wno-overflow $<
+$(TEST_DIR)/%.o: $(TEST_DIR)/%.c $(LIBURING_DIR) $(MBEDTLS_DIR)
+	$(CC) -c -o $@ -I$(INCLUDE_DIR) -I$(LIBURING_DIR)/src/include -I$(MBEDTLS_DIR)/include -I$(MBEDTLS_DIR)/library -g -Wall -Wno-overflow $<
 
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
+$(SRC_DIR)/%.o: $(SRC_DIR)/%.c $(LIBURING_DIR) $(MBEDTLS_DIR)
 	$(CC) -c -o $@ -I$(INCLUDE_DIR) -I$(LIBURING_DIR)/src/include -I$(MBEDTLS_DIR)/include -I$(MBEDTLS_DIR)/library -g -Wall $<
 
 $(LIB_DIR)/%.o: $(LIB_DIR)/%.c $(XXHASH_DIR)
